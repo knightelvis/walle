@@ -1,26 +1,12 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 #
-# Simple Bot to reply to Telegram messages
-# Copyright (C) 2015 Leandro Toledo de Souza <leandrotoeldodesouza@gmail.com>
-#
-# This program is free software: you can redistribute it and/or modify
-# it under the terms of the GNU General Public License as published by
-# the Free Software Foundation, either version 3 of the License, or
-# (at your option) any later version.
-#
-# This program is distributed in the hope that it will be useful,
-# but WITHOUT ANY WARRANTY; without even the implied warranty of
-# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-# GNU General Public License for more details.
-#
-# You should have received a copy of the GNU General Public License
-# along with this program.  If not, see [http://www.gnu.org/licenses/].
-
 
 import logging
 import telegram
 from time import sleep
+import sys
+import datetime
 
 try:
     from urllib.error import URLError
@@ -30,11 +16,17 @@ except ImportError:
 with open("token.key") as f:
     TOKEN = f.readline().strip()
 
-# TOKEN = "146864334:AAEZ2TH4_LKS3W47Nr93pxxYU5Gy30IZJeQ"
-# TOKEN = "168470730:AAGd-3p1ix3A7wKEuYMOIxHhwRcKCSRFHuU"
+logger = logging.getLogger('wallebot')
+logger.setLevel(logging.DEBUG)
 
+ch = logging.StreamHandler(sys.stdout)
+ch.setLevel(logging.DEBUG)
+formatter = logging.Formatter(
+    '%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+ch.setFormatter(formatter)
+logger.addHandler(ch)
 
-
+is_greeting = False
 
 def main():
     # Telegram Bot Authorization Token
@@ -47,12 +39,10 @@ def main():
     except IndexError:
         update_id = None
 
-    logging.basicConfig(
-        format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
-
     while True:
         try:
             update_id = echo(bot, update_id)
+            logger.debug('update_id:%s', update_id)
         except telegram.TelegramError as e:
             # These are network problems with Telegram.
             if e.message in ("Bad Gateway", "Timed out"):
@@ -68,23 +58,49 @@ def main():
 
 
 def echo(bot, update_id):
+    global is_greeting
 
     # Request updates after the last update_id
     for update in bot.getUpdates(offset=update_id, timeout=10):
         # chat_id is required to reply to any message
         chat_id = update.message.chat_id
         from_user = update.message.from_user
-        # print "chatid:" + str(chat_id) + " user:" + str(from_user.id) + " " + from_user.username
+        print("chatid:" + str(chat_id) +
+              " user:" + str(from_user.id) +
+              " " + from_user.username)
 
         update_id = update.update_id + 1
         message = update.message.text
         print(message)
-        if message:
+        record(message, from_user.username)
+
+        # response = message
+        response = ""
+
+        if(message and message.startswith("你是谁") and not is_greeting):
+            response = get_one_year()
+            is_greeting = True
+
+        if response:
             # Reply to the message
             bot.sendMessage(chat_id=chat_id,
-                            text=message)
+                            text=response)
 
     return update_id
+
+
+def get_one_year():
+    with open("1year.txt", "r") as f:
+        mydear = f.read()
+
+    return mydear
+
+
+def record(content, sender):
+    with open("content.txt", "a") as f:
+        f.write(content + "#" +
+                str(datetime.datetime.now()) + "#" +
+                sender + "\n")
 
 
 if __name__ == '__main__':
