@@ -67,24 +67,12 @@ def echo(bot, update_id):
         from_user = update.message.from_user
         print("chatid:" + str(chat_id) +
               " user:" + str(from_user.id) +
-              " " + from_user.username)
+              " " + str(from_user.username))
 
         update_id = update.update_id + 1
         message = update.message.text
         print(message)
         record(message, from_user.username)
-
-        # response = message
-        response = ""
-
-        if(message and message.startswith("你是谁") and not is_greeting):
-            response = get_one_year()
-            is_greeting = True
-
-        if response:
-            # Reply to the message
-            bot.sendMessage(chat_id=chat_id,
-                            text=response)
 
     return update_id
 
@@ -100,7 +88,7 @@ def record(content, sender):
     with open("content.txt", "a") as f:
         f.write(content + "#" +
                 str(datetime.datetime.now()) + "#" +
-                sender + "\n")
+                str(sender) + "\n")
 
 
 if __name__ == '__main__':
