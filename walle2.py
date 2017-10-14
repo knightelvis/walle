@@ -16,6 +16,9 @@ BANG = "90057254"
 CHUI = "119906841"
 DB_NAME = "walle.db"
 
+with open("token.key") as f:
+    TOKEN = f.readline().strip()
+
 # Define a few command handlers. These usually take the two arguments bot and
 # update. Error handlers also receive the raised TelegramError object in error.
 def start(bot, update):
@@ -146,14 +149,14 @@ def main():
     kw = {
         'format': '%(asctime)s - %(name)s - %(levelname)s - %(message)s',
         'level': logging.DEBUG,
-        # 'filename': 'walle2.log',
-        'stream': sys.stdout,
+        'filename': 'walle2.log',
+        # 'stream': sys.stdout,
     }
 
     logging.basicConfig(**kw)
 
     # Create the EventHandler and pass it your bot's token.
-    updater = Updater("")
+    updater = Updater(TOKEN)
 
     # Get the dispatcher to register handlers
     dp = updater.dispatcher
