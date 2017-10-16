@@ -133,7 +133,7 @@ def _parse_payment_cmd(msg):
     nominal value and the reason for payment. If not, return empty array.
     '''
     if msg and msg.startswith("walle!"):
-        elements = msg.strip().split()
+        elements = msg.lower().strip().split()
         # filter == [x for x in elements if func(x)]
         return list(filter(None, elements))[2:]  # skip 'walle!' and 'pay'
     else:
@@ -148,7 +148,7 @@ def main():
 
     kw = {
         'format': '%(asctime)s - %(name)s - %(levelname)s - %(message)s',
-        'level': logging.DEBUG,
+        'level': logging.INFO,
         'filename': 'walle2.log',
         # 'stream': sys.stdout,
     }
