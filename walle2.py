@@ -132,8 +132,8 @@ def _parse_payment_cmd(msg):
     If the msg is valid command, the returned array has the money
     nominal value and the reason for payment. If not, return empty array.
     '''
-    if msg and msg.startswith("walle!"):
-        elements = msg.lower().strip().split()
+    if msg and msg.lower().startswith("walle!"):
+        elements = msg.strip().split()
         # filter == [x for x in elements if func(x)]
         return list(filter(None, elements))[2:]  # skip 'walle!' and 'pay'
     else:
